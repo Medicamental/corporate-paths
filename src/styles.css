@@ -19,6 +19,17 @@
  */
 
 @theme inline {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;
+  --color-decision: var(--decision);
+  --color-decision-foreground: var(--decision-foreground);
+  --color-decision-soft: var(--decision-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --shadow-card: 0 1px 2px oklch(0.25 0.03 260 / 0.05), 0 8px 24px -16px oklch(0.25 0.03 260 / 0.16);
+  --shadow-lift: 0 2px 4px oklch(0.25 0.03 260 / 0.06), 0 18px 40px -20px oklch(0.25 0.03 260 / 0.22);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -26,6 +37,7 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
