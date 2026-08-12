@@ -5,6 +5,7 @@ const kindLabel: Record<ProcessNode["kind"], string> = {
   start: "Início",
   step: "Etapa",
   decision: "Decisão",
+  redirect: "Direcionamento",
   end: "Conclusão",
 };
 
@@ -18,7 +19,8 @@ export function NodeCard({
   onSelect: () => void;
 }) {
   const isDecision = node.kind === "decision";
-  const isTerminal = node.kind === "start" || node.kind === "end";
+  const isRedirect = node.kind === "redirect";
+  const isStriped = node.kind === "start" || node.kind === "end" || isRedirect;
 
   return (
     <button
@@ -30,15 +32,19 @@ export function NodeCard({
         "rounded-xl border bg-surface px-6 py-5 shadow-card",
         "hover:-translate-y-0.5 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         isDecision ? "border-decision/35 bg-decision-soft" : "border-border",
-        isTerminal && "border-primary/25",
+        node.kind === "start" && "border-primary/25",
+        node.kind === "end" && "border-success/25",
+        isRedirect && "border-redirect/25",
         active && "border-primary/60 shadow-lift",
       )}
     >
-      {isTerminal ? (
+      {isStriped ? (
         <span
           className={cn(
             "absolute inset-y-0 left-0 w-[3px] rounded-l-xl",
-            node.kind === "start" ? "bg-primary" : "bg-success",
+            node.kind === "start" && "bg-primary",
+            node.kind === "end" && "bg-success",
+            isRedirect && "bg-redirect",
           )}
         />
       ) : null}

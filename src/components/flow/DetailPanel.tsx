@@ -1,7 +1,15 @@
-import type { ProcessNode } from "@/data/process";
+import type { ProcessNode, SacProcess } from "@/data/process";
 import { processMeta } from "@/data/process";
 
-export function DetailPanel({ node }: { node: ProcessNode }) {
+export function DetailPanel({
+  node,
+  process,
+  onNavigate,
+}: {
+  node: ProcessNode;
+  process: SacProcess;
+  onNavigate: (node: ProcessNode) => void;
+}) {
   return (
     <aside className="rounded-xl border border-border bg-surface p-6 shadow-card">
       <div className="flex items-center justify-between">
@@ -52,13 +60,36 @@ export function DetailPanel({ node }: { node: ProcessNode }) {
               Caminhos possíveis
             </dt>
             <dd className="mt-1.5 space-y-2">
-              {node.branches.map((branch) => (
-                <p key={branch.label} className="text-foreground/85">
-                  <span className="font-semibold text-foreground">{branch.label}</span>
-                  {" · "}
-                  {branch.outcome}
-                </p>
-              ))}
+              {node.branches.map((branch) => {
+                const target = process.nodes[branch.next];
+                return (
+                  <button
+                    key={branch.label}
+                    type="button"
+                    onClick={() => target && onNavigate(target)}
+                    className="block w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-left transition-colors hover:border-primary/40 hover:bg-secondary"
+                  >
+                    <span className="font-semibold text-foreground">{branch.label}</span>
+                    <span className="text-foreground/70"> · {branch.outcome}</span>
+                  </button>
+                );
+              })}
+            </dd>
+          </div>
+        ) : null}
+        {node.next && process.nodes[node.next] ? (
+          <div>
+            <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Próxima etapa
+            </dt>
+            <dd className="mt-1.5">
+              <button
+                type="button"
+                onClick={() => onNavigate(process.nodes[node.next!]!)}
+                className="block w-full rounded-lg border border-border bg-secondary/50 px-3 py-2 text-left transition-colors hover:border-primary/40 hover:bg-secondary"
+              >
+                <span className="font-medium text-foreground">{process.nodes[node.next!]!.title}</span>
+              </button>
             </dd>
           </div>
         ) : null}

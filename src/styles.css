@@ -26,6 +26,9 @@
   --color-decision-soft: var(--decision-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
+  --color-redirect: var(--redirect);
+  --color-redirect-foreground: var(--redirect-foreground);
+  --color-redirect-soft: var(--redirect-soft);
   --color-line: var(--line);
   --color-surface: var(--surface);
   --shadow-card: 0 1px 2px oklch(0.25 0.03 260 / 0.05), 0 8px 24px -16px oklch(0.25 0.03 260 / 0.16);
@@ -95,6 +98,9 @@
   --decision-soft: oklch(0.965 0.017 250);
   --success: oklch(0.48 0.075 165);
   --success-soft: oklch(0.965 0.02 165);
+  --redirect: oklch(0.5 0.1 300);
+  --redirect-foreground: oklch(0.985 0.004 250);
+  --redirect-soft: oklch(0.965 0.02 300);
   --destructive: oklch(0.52 0.16 25);
   --destructive-foreground: oklch(0.985 0.004 250);
   --border: oklch(0.918 0.008 252);
@@ -157,6 +163,9 @@
   --decision-soft: oklch(0.28 0.04 255);
   --success: oklch(0.7 0.09 165);
   --success-soft: oklch(0.26 0.04 168);
+  --redirect: oklch(0.72 0.1 300);
+  --redirect-foreground: oklch(0.18 0.03 262);
+  --redirect-soft: oklch(0.28 0.04 300);
 }
 
 @layer base {

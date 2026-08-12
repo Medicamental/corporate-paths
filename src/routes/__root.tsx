@@ -77,12 +77,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Processos Corporativos" },
-      { name: "description", content: "Fluxogramas oficiais de processos internos da empresa." },
-      { property: "og:title", content: "Processos Corporativos" },
+      { title: "Processos do SAC | Medicamental" },
+      {
+        name: "description",
+        content: "Central de consulta dos fluxos de atendimento do Sac Medicamental.",
+      },
+      { property: "og:title", content: "Processos do SAC" },
       {
         property: "og:description",
-        content: "Fluxogramas oficiais de processos internos da empresa.",
+        content: "Central de consulta dos fluxos de atendimento do Sac Medicamental.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
