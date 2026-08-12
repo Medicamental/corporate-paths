@@ -80,12 +80,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Processos do SAC | Medicamental" },
       {
         name: "description",
-        content: "Central de consulta dos fluxos de atendimento do Sac Medicamental.",
+        content: "Fluxos ATUAIS exercidos pelo Sac Medicamental — central de consulta dos atendimentos.",
       },
-      { property: "og:title", content: "Processos do SAC" },
+      { property: "og:title", content: "Processos do SAC — Fluxos atuais" },
       {
         property: "og:description",
-        content: "Central de consulta dos fluxos de atendimento do Sac Medicamental.",
+        content: "Fluxos ATUAIS exercidos pelo Sac Medicamental — central de consulta dos atendimentos.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -13,12 +13,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Central de consulta e direcionamento dos fluxos de atendimento do Sac Medicamental: devoluções, recusas, canhoto e motivos de devolução.",
+          "Fluxos ATUAIS exercidos pelo Sac Medicamental: devoluções, recusas, canhoto e motivos de devolução — central de consulta e direcionamento dos atendimentos.",
       },
-      { property: "og:title", content: "Processos do SAC" },
+      { property: "og:title", content: "Processos do SAC — Fluxos atuais" },
       {
         property: "og:description",
-        content: "Mapa visual dos fluxos de atendimento do Sac, com etapas, decisões e responsáveis.",
+        content: "Mapa visual dos fluxos ATUAIS de atendimento do Sac, com etapas, decisões e responsáveis.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -57,16 +57,19 @@ function Index() {
   const activeNode = process.nodes[activeId] ?? process.nodes[process.startId]!;
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <header className="flex h-14 flex-none items-center justify-between border-b border-border bg-surface px-6">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground">
-            M
-          </span>
+    <div
+      className="dark flex h-screen flex-col bg-background"
+      style={{
+        backgroundImage: "linear-gradient(150deg, #020617 0%, #0a1f3d 48%, #000000 100%)",
+      }}
+    >
+      <header className="flex h-16 flex-none items-center justify-between border-b border-border bg-surface px-6">
+        <div className="flex items-center gap-3">
+          <img src="/logo-medicamental.png" alt="Medicamental" className="h-9 w-auto" />
           <div className="leading-tight">
             <h1 className="text-[13.5px] font-semibold text-foreground">Processos do SAC</h1>
             <p className="text-[11px] text-muted-foreground">
-              Central de consulta e direcionamento dos fluxos de atendimento
+              Fluxos atuais exercidos pelo Sac · central de consulta e direcionamento dos atendimentos
             </p>
           </div>
         </div>
