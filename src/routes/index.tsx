@@ -34,8 +34,14 @@ const legend = [
 ];
 
 function Index() {
-  const [activeId, setActiveId] = useState(processNodes[0].id);
-  const activeNode = processNodes.find((n) => n.id === activeId) ?? processNodes[0];
+  const [firstNode, ...restNodes] = processNodes as [
+    (typeof processNodes)[number],
+    ...(typeof processNodes)[number][],
+  ];
+  void restNodes;
+  const [activeId, setActiveId] = useState(firstNode.id);
+  const activeNode = processNodes.find((n) => n.id === activeId) ?? firstNode;
+
 
   return (
     <div className="min-h-screen bg-background">
