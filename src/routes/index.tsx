@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { processes, type ProcessNode } from "@/data/process";
+import { cn } from "@/lib/utils";
+import { processesByVariant, variantLabel, type ProcessNode, type Variant } from "@/data/process";
 import { FlowChain } from "@/components/flow/FlowChain";
 import { DetailPanel } from "@/components/flow/DetailPanel";
 import { ProcessSidebar } from "@/components/flow/ProcessSidebar";
@@ -29,10 +30,12 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [view, setView] = useState<"flow" | "catalog">("flow");
+  const [variant, setVariant] = useState<Variant>("atual");
+  const processes = processesByVariant[variant];
   const [processId, setProcessId] = useState(processes[0]!.id);
   const process = useMemo(
     () => processes.find((p) => p.id === processId) ?? processes[0]!,
-    [processId],
+    [processes, processId],
   );
   const [activeId, setActiveId] = useState(process.startId);
 
@@ -42,6 +45,13 @@ function Index() {
     setProcessId(id);
     setActiveId(next.startId);
     setView("flow");
+  }
+
+  function selectVariant(next: Variant) {
+    setVariant(next);
+    const nextProcesses = processesByVariant[next];
+    const stillExists = nextProcesses.find((p) => p.id === processId);
+    setActiveId((stillExists ?? nextProcesses[0]!).startId);
   }
 
   function selectSearchHit(pId: string, nodeId: string) {
@@ -73,13 +83,33 @@ function Index() {
             </p>
           </div>
         </div>
-        <span className="rounded-full border border-border bg-secondary px-2.5 py-1 text-[10.5px] text-muted-foreground">
-          Uso interno · Medicamental
-        </span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-0.5 rounded-full border border-border bg-secondary p-0.5">
+            {(["atual", "reformulado"] as Variant[]).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => selectVariant(v)}
+                className={cn(
+                  "rounded-full px-3 py-1.5 text-[11.5px] font-medium transition-colors",
+                  variant === v
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {variantLabel[v]}
+              </button>
+            ))}
+          </div>
+          <span className="rounded-full border border-border bg-secondary px-2.5 py-1 text-[10.5px] text-muted-foreground">
+            Uso interno · Medicamental
+          </span>
+        </div>
       </header>
 
       <div className="flex min-h-0 flex-1">
         <ProcessSidebar
+          processes={processes}
           activeProcessId={processId}
           view={view}
           onSelectProcess={selectProcess}
@@ -91,10 +121,15 @@ function Index() {
           <div className="flex items-center gap-1.5 border-b border-border px-8 py-3.5 text-[12.5px] text-muted-foreground">
             <span className="font-medium text-foreground/80">Processos do SAC</span>
             <span className="opacity-60">/</span>
+            <span>{variantLabel[variant]}</span>
             {view === "catalog" ? (
-              <span className="font-semibold text-foreground">Motivos de devolução</span>
+              <>
+                <span className="opacity-60">/</span>
+                <span className="font-semibold text-foreground">Motivos de devolução</span>
+              </>
             ) : (
               <>
+                <span className="opacity-60">/</span>
                 <span>{process.title}</span>
                 <span className="opacity-60">/</span>
                 <span className="font-semibold text-foreground">Fluxo principal</span>
@@ -107,7 +142,17 @@ function Index() {
               <ReasonCatalog />
             ) : (
               <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14">
-                <section aria-label="Fluxo do processo" className="flex flex-col items-center">
+                <section aria-label="Fluxo do processo" className="flex w-full flex-col items-center">
+                  {variant === "reformulado" && process.changeNote ? (
+                    <div className="mb-8 w-full max-w-2xl rounded-xl border border-redirect/35 bg-redirect-soft px-5 py-4">
+                      <span className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-redirect">
+                        O que mudou neste fluxo
+                      </span>
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-foreground/85">
+                        {process.changeNote}
+                      </p>
+                    </div>
+                  ) : null}
                   <FlowChain
                     process={process}
                     nodeId={process.startId}

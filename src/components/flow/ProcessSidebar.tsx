@@ -1,16 +1,18 @@
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { processes, reasonGroups, type SacProcess } from "@/data/process";
+import { reasonGroups, type SacProcess } from "@/data/process";
 
 type SearchHit = { processId: string; nodeId: string; title: string; processTitle: string };
 
 export function ProcessSidebar({
+  processes,
   activeProcessId,
   view,
   onSelectProcess,
   onSelectCatalog,
   onSelectSearchHit,
 }: {
+  processes: SacProcess[];
   activeProcessId: string;
   view: "flow" | "catalog";
   onSelectProcess: (id: string) => void;
@@ -30,7 +32,7 @@ export function ProcessSidebar({
           processTitle: p.title,
         })),
       ),
-    [],
+    [processes],
   );
 
   const results =

@@ -38,7 +38,11 @@ export type SacProcess = {
   entry: string;
   startId: string;
   nodes: Record<string, ProcessNode>;
+  /** Só presente na variante "reformulado", quando o processo muda em relação ao atual. */
+  changeNote?: string;
 };
+
+export type Variant = "atual" | "reformulado";
 
 export const processMeta = {
   name: "Processos do Sac",
@@ -52,7 +56,14 @@ function byId(nodes: ProcessNode[]): Record<string, ProcessNode> {
   return Object.fromEntries(nodes.map((n) => [n.id, n]));
 }
 
-export const processes: SacProcess[] = [
+/**
+ * "Atual" = o que é praticado hoje no Sac. "Reformulado" = a nova versão do
+ * processo, fruto da reestruturação do Sac, que passará a valer em breve.
+ * `Devolução total` e `Devolução parcial` mudam entre as duas variantes —
+ * `Recusa no ato da entrega` e `Canhoto` permanecem idênticos (o mesmo objeto
+ * é reaproveitado nas duas listas, sem duplicar dados).
+ */
+export const processesAtual: SacProcess[] = [
   {
     id: "total",
     title: "Devolução total",
@@ -484,6 +495,196 @@ export const processes: SacProcess[] = [
     ]),
   },
 ];
+
+/**
+ * Reformulação do Sac: a verificação de canhoto deixa de ser um ponto de
+ * decisão dentro dos fluxos de devolução total e parcial. A reativação de
+ * título só volta a aparecer em um cenário específico (registrado como nota
+ * na etapa "Coleta" da devolução total) — fora disso, os dois fluxos passam
+ * a ser lineares, sem bifurcação.
+ */
+export const processesReformulado: SacProcess[] = [
+  {
+    id: "total",
+    title: "Devolução total",
+    entry: "Sac ou Portal do Cliente",
+    startId: "tr1",
+    changeNote:
+      "A verificação de canhoto deixou de ser um ponto de decisão no meio do fluxo. A reativação do título agora só ocorre em um cenário específico, durante a coleta — veja a etapa \"Coleta\". Fora esse caso, o processo segue direto até a efetivação.",
+    nodes: byId([
+      {
+        id: "tr1",
+        code: "01",
+        kind: "start",
+        title: "Abertura da devolução",
+        summary: "Cliente ou atendente formaliza a solicitação de devolução total do pedido.",
+        owner: "Sac / Portal do Cliente",
+        sla: "7 dias",
+        notes: "Confirme o número do pedido e o motivo da devolução antes de registrar a abertura.",
+        next: "tr2",
+      },
+      {
+        id: "tr2",
+        code: "02",
+        kind: "step",
+        title: "Emissão do espelho",
+        summary:
+          "É gerado o espelho da devolução, documento-base para a nota fiscal de devolução (NFD).",
+        owner: "Sac / Portal do Cliente",
+        sla: "5 dias",
+        notes: "Verifique se todos os itens do pedido original constam no espelho gerado.",
+        next: "tr3",
+      },
+      {
+        id: "tr3",
+        code: "03",
+        kind: "step",
+        title: "Anexar a NFD",
+        summary: "A nota fiscal de devolução é anexada ao protocolo.",
+        owner: "Sac / Portal do Cliente",
+        sla: "5 dias",
+        inputs: ["Nota Fiscal de Devolução (NFD)"],
+        notes:
+          "Pelo Sac, o atendente anexa a NFD e dá andamento manualmente. Pelo Portal do Cliente, o cliente anexa a NFD e o andamento é automático.",
+        next: "tr4",
+      },
+      {
+        id: "tr4",
+        code: "04",
+        kind: "step",
+        title: "Análise da NFD e solicitação de coleta",
+        summary: "O setor de devolução confere a NFD e solicita a coleta da mercadoria.",
+        owner: "Setor de Devolução",
+        sla: "5 dias",
+        notes: "Confirme divergências entre a NFD e o pedido original antes de solicitar a coleta.",
+        next: "tr5",
+      },
+      {
+        id: "tr5",
+        code: "05",
+        kind: "step",
+        title: "Sustação de título",
+        summary: "O financeiro sustém a cobrança do título vinculado ao pedido em devolução.",
+        owner: "Financeiro",
+        sla: "5 dias",
+        notes: "A sustação deve ocorrer antes do vencimento do título para evitar cobrança indevida.",
+        next: "tr6",
+      },
+      {
+        id: "tr6",
+        code: "06",
+        kind: "step",
+        title: "Coleta",
+        summary: "A transportadora realiza a coleta da mercadoria devolvida no endereço do cliente.",
+        owner: "Transportadora",
+        sla: "15 dias",
+        notes:
+          "Reativação: se, no momento da coleta, o cliente não disponibilizar a mercadoria, a transportadora envia a ressalva e o título é reativado.",
+        next: "tr7",
+      },
+      {
+        id: "tr7",
+        code: "07",
+        kind: "end",
+        title: "Recebimento e efetivação",
+        summary:
+          "A devolução retorna ao CD; após a conferência da nota fiscal, o processo segue para efetivação.",
+        owner: "Setor de Devolução",
+        sla: "5 dias",
+      },
+    ]),
+  },
+  {
+    id: "parcial",
+    title: "Devolução parcial",
+    entry: "Sac ou Portal do Cliente",
+    startId: "pr1",
+    changeNote:
+      "O ponto de decisão sobre o canhoto foi removido — o fluxo de devolução parcial agora é totalmente linear, sem previsão de reativação de título nesta etapa.",
+    nodes: byId([
+      {
+        id: "pr1",
+        code: "01",
+        kind: "start",
+        title: "Abertura da devolução",
+        summary: "Cliente ou atendente formaliza a solicitação de devolução parcial do pedido.",
+        owner: "Sac / Portal do Cliente",
+        sla: "7 dias",
+        notes: "Especifique claramente quais itens do pedido fazem parte da devolução parcial.",
+        next: "pr2",
+      },
+      {
+        id: "pr2",
+        code: "02",
+        kind: "step",
+        title: "Emissão do espelho",
+        summary:
+          "É gerado o espelho da devolução, documento-base para a nota fiscal de devolução (NFD).",
+        owner: "Sac / Portal do Cliente",
+        sla: "5 dias",
+        notes: "Verifique se apenas os itens da devolução parcial constam no espelho.",
+        next: "pr3",
+      },
+      {
+        id: "pr3",
+        code: "03",
+        kind: "step",
+        title: "Anexar a NFD",
+        summary: "A nota fiscal de devolução é anexada ao protocolo.",
+        owner: "Sac / Portal do Cliente",
+        sla: "5 dias",
+        inputs: ["Nota Fiscal de Devolução (NFD)"],
+        notes:
+          "Pelo Sac, o atendente anexa a NFD e dá andamento manualmente. Pelo Portal do Cliente, o cliente anexa a NFD e o andamento é automático.",
+        next: "pr4",
+      },
+      {
+        id: "pr4",
+        code: "04",
+        kind: "step",
+        title: "Análise da NFD e solicitação de coleta",
+        summary: "O setor de devolução confere a NFD e solicita a coleta da parte devolvida.",
+        owner: "Setor de Devolução",
+        sla: "5 dias",
+        notes: "Confirme que o volume a coletar corresponde apenas aos itens da devolução parcial.",
+        next: "pr5",
+      },
+      {
+        id: "pr5",
+        code: "05",
+        kind: "step",
+        title: "Coleta",
+        summary: "A transportadora realiza a coleta da mercadoria devolvida no endereço do cliente.",
+        owner: "Transportadora",
+        sla: "15 dias",
+        notes: "Acompanhe o prazo de coleta junto à transportadora; atrasos devem ser registrados.",
+        next: "pr6",
+      },
+      {
+        id: "pr6",
+        code: "06",
+        kind: "end",
+        title: "Recebimento e efetivação",
+        summary:
+          "A devolução retorna ao CD; após a conferência da nota fiscal, o processo segue para efetivação.",
+        owner: "Setor de Devolução",
+        sla: "5 dias",
+      },
+    ]),
+  },
+  processesAtual.find((p) => p.id === "recusa")!,
+  processesAtual.find((p) => p.id === "canhoto")!,
+];
+
+export const processesByVariant: Record<Variant, SacProcess[]> = {
+  atual: processesAtual,
+  reformulado: processesReformulado,
+};
+
+export const variantLabel: Record<Variant, string> = {
+  atual: "Fluxo atual",
+  reformulado: "Fluxo reformulado",
+};
 
 export type ReasonGroup = {
   title: string;
