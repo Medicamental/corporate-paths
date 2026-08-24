@@ -1,11 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { processesByVariant, variantLabel, type ProcessNode, type Variant } from "@/data/process";
+import {
+  mercadoriaNaoApresentadaReasons,
+  processesByVariant,
+  reasonGroups,
+  recusaReasons,
+  variantLabel,
+  type ProcessNode,
+  type Variant,
+} from "@/data/process";
 import { FlowChain } from "@/components/flow/FlowChain";
 import { DetailPanel } from "@/components/flow/DetailPanel";
-import { ProcessSidebar } from "@/components/flow/ProcessSidebar";
+import { ProcessSidebar, type CatalogView } from "@/components/flow/ProcessSidebar";
 import { ReasonCatalog } from "@/components/flow/ReasonCatalog";
+
+const catalogTitle: Record<CatalogView, string> = {
+  "catalog-motivos": "Motivos de devolução",
+  "catalog-recusa": "Motivo de recusa no ato",
+  "catalog-mercadoria": "Motivo de mercadoria não apresentada",
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,7 +43,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [view, setView] = useState<"flow" | "catalog">("flow");
+  const [view, setView] = useState<"flow" | CatalogView>("flow");
   const [variant, setVariant] = useState<Variant>("atual");
   const processes = processesByVariant[variant];
   const [processId, setProcessId] = useState(processes[0]!.id);
@@ -52,6 +66,11 @@ function Index() {
     const nextProcesses = processesByVariant[next];
     const stillExists = nextProcesses.find((p) => p.id === processId);
     setActiveId((stillExists ?? nextProcesses[0]!).startId);
+    // "Motivo de recusa no ato" e "Motivo de mercadoria não apresentada" só existem
+    // no fluxo reformulado — voltar pro fluxo principal se estava numa delas.
+    if (next === "atual" && (view === "catalog-recusa" || view === "catalog-mercadoria")) {
+      setView("flow");
+    }
   }
 
   function selectSearchHit(pId: string, nodeId: string) {
@@ -112,8 +131,9 @@ function Index() {
           processes={processes}
           activeProcessId={processId}
           view={view}
+          variant={variant}
           onSelectProcess={selectProcess}
-          onSelectCatalog={() => setView("catalog")}
+          onSelectCatalog={(catalog) => setView(catalog)}
           onSelectSearchHit={selectSearchHit}
         />
 
@@ -122,10 +142,10 @@ function Index() {
             <span className="font-medium text-foreground/80">Processos do SAC</span>
             <span className="opacity-60">/</span>
             <span>{variantLabel[variant]}</span>
-            {view === "catalog" ? (
+            {view !== "flow" ? (
               <>
                 <span className="opacity-60">/</span>
-                <span className="font-semibold text-foreground">Motivos de devolução</span>
+                <span className="font-semibold text-foreground">{catalogTitle[view]}</span>
               </>
             ) : (
               <>
@@ -138,8 +158,14 @@ function Index() {
           </div>
 
           <div className="px-8 py-10">
-            {view === "catalog" ? (
-              <ReasonCatalog />
+            {view === "catalog-motivos" ? (
+              <ReasonCatalog groups={reasonGroups} />
+            ) : view === "catalog-recusa" ? (
+              <ReasonCatalog groups={[{ title: catalogTitle["catalog-recusa"], items: recusaReasons }]} />
+            ) : view === "catalog-mercadoria" ? (
+              <ReasonCatalog
+                groups={[{ title: catalogTitle["catalog-mercadoria"], items: mercadoriaNaoApresentadaReasons }]}
+              />
             ) : (
               <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14">
                 <section aria-label="Fluxo do processo" className="flex w-full flex-col items-center">

@@ -95,6 +95,13 @@ export function DetailPanel({
         ) : null}
       </dl>
 
+      {node.sideNote ? (
+        <p className="mt-6 rounded-lg border border-dashed border-decision/45 bg-decision-soft px-4 py-3 text-[13px] leading-relaxed text-foreground/85">
+          <span className="mr-1 font-semibold text-decision">Atenção —</span>
+          {node.sideNote}
+        </p>
+      ) : null}
+
       {node.notes ? (
         <p className="mt-6 rounded-lg border border-border bg-secondary/70 px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">
           {node.notes}

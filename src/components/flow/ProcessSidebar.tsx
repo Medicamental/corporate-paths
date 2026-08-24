@@ -1,22 +1,31 @@
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { reasonGroups, type SacProcess } from "@/data/process";
+import {
+  mercadoriaNaoApresentadaReasons,
+  reasonGroups,
+  recusaReasons,
+  type SacProcess,
+  type Variant,
+} from "@/data/process";
 
 type SearchHit = { processId: string; nodeId: string; title: string; processTitle: string };
+export type CatalogView = "catalog-motivos" | "catalog-recusa" | "catalog-mercadoria";
 
 export function ProcessSidebar({
   processes,
   activeProcessId,
   view,
+  variant,
   onSelectProcess,
   onSelectCatalog,
   onSelectSearchHit,
 }: {
   processes: SacProcess[];
   activeProcessId: string;
-  view: "flow" | "catalog";
+  view: "flow" | CatalogView;
+  variant: Variant;
   onSelectProcess: (id: string) => void;
-  onSelectCatalog: () => void;
+  onSelectCatalog: (catalog: CatalogView) => void;
   onSelectSearchHit: (processId: string, nodeId: string) => void;
 }) {
   const [query, setQuery] = useState("");
@@ -89,12 +98,30 @@ export function ProcessSidebar({
           />
         ))}
         <NavItem
-          active={view === "catalog"}
+          active={view === "catalog-motivos"}
           label="Motivos de devolução"
           count={totalReasons}
           tone="redirect"
-          onClick={onSelectCatalog}
+          onClick={() => onSelectCatalog("catalog-motivos")}
         />
+        {variant === "reformulado" ? (
+          <>
+            <NavItem
+              active={view === "catalog-recusa"}
+              label="Motivo de recusa no ato"
+              count={recusaReasons.length}
+              tone="redirect"
+              onClick={() => onSelectCatalog("catalog-recusa")}
+            />
+            <NavItem
+              active={view === "catalog-mercadoria"}
+              label="Motivo de mercadoria não apresentada"
+              count={mercadoriaNaoApresentadaReasons.length}
+              tone="redirect"
+              onClick={() => onSelectCatalog("catalog-mercadoria")}
+            />
+          </>
+        ) : null}
       </nav>
 
       <div className="mt-auto border-t border-border p-4">

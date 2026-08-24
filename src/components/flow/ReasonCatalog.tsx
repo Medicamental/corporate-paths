@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { reasonGroups } from "@/data/process";
+import type { ReasonGroup } from "@/data/process";
 
-export function ReasonCatalog() {
-  const flat = reasonGroups.flatMap((g) => g.items);
+export function ReasonCatalog({ groups }: { groups: ReasonGroup[] }) {
+  const flat = groups.flatMap((g) => g.items);
   const [selected, setSelected] = useState(flat[0]!);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14">
-      <div className="grid gap-4 sm:grid-cols-2">
-        {reasonGroups.map((group) => (
+      <div className={cn("grid gap-4", groups.length > 1 && "sm:grid-cols-2")}>
+        {groups.map((group) => (
           <div key={group.title} className="rounded-xl border border-border bg-surface p-5 shadow-card">
             <h3 className="text-sm font-semibold text-foreground">{group.title}</h3>
             <div className="mt-3 flex flex-wrap gap-2">

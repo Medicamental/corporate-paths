@@ -28,6 +28,10 @@ export type ProcessNode = {
   sla: string;
   inputs?: string[];
   notes?: string;
+  /** Observação de destaque, sempre visível no fluxo (não só ao clicar no nó) — usada
+   * para condições relevantes que não são mais uma decisão no fluxo, como a
+   * reativação de título no fluxo reformulado. */
+  sideNote?: string;
   branches?: Branch[];
   next?: string;
 };
@@ -578,7 +582,8 @@ export const processesReformulado: SacProcess[] = [
         summary: "A transportadora realiza a coleta da mercadoria devolvida no endereço do cliente.",
         owner: "Transportadora",
         sla: "15 dias",
-        notes:
+        notes: "Acompanhe o prazo de coleta junto à transportadora; atrasos devem ser registrados.",
+        sideNote:
           "Reativação: se, no momento da coleta, o cliente não disponibilizar a mercadoria, a transportadora envia a ressalva e o título é reativado.",
         next: "tr7",
       },
@@ -764,5 +769,49 @@ export const reasonGroups: ReasonGroup[] = [
       },
       { title: "Carta de correção", text: "Cliente solicita a carta de correção em até 30 dias." },
     ],
+  },
+];
+
+/**
+ * Catálogos de motivos específicos da reestruturação do Sac — só existem no
+ * fluxo reformulado, ao lado (não em substituição) do catálogo geral de
+ * "Motivos de devolução" acima, que continua o mesmo nas duas variantes.
+ */
+export type ReasonItem = { title: string; text: string };
+
+export const recusaReasons: ReasonItem[] = [
+  { title: "Atraso", text: "O pedido atrasou." },
+  { title: "Duplicidade", text: "Quando constam 2 pedidos iguais." },
+  { title: "Não solicitado", text: "Pedido gerado indevidamente pelo vendedor." },
+  { title: "Avaria", text: "Mercadoria danificada." },
+  {
+    title: "Falta de volume",
+    text: "Cliente recebeu o pedido faltando volume e fez ressalva. Caso contrário, pedir filmagem e rastrear.",
+  },
+  { title: "Desacordo comercial", text: "Valor errado ou alto; reversão realizada por Medweb." },
+  {
+    title: "Volume incorreto",
+    text: "Volume recebido com etiqueta de outro distribuidor, ou de outra farmácia com etiqueta Medicamental.",
+  },
+];
+
+export const mercadoriaNaoApresentadaReasons: ReasonItem[] = [
+  {
+    title: "Falta de volume",
+    text: "Cliente recebeu o pedido faltando volume e fez ressalva. Caso contrário, pedir filmagem e rastrear.",
+  },
+  { title: "Transportadora", text: "Motivo relacionado à transportadora responsável pela entrega." },
+  {
+    title: "Mercadoria não expedida",
+    text: "A mercadoria não saiu do CD, por solicitação de supervisor (pedido errado).",
+  },
+  {
+    title: "Cadastro incorreto",
+    text: "Cadastro do cliente — por exemplo, o endereço — está errado na Medicamental.",
+  },
+  { title: "Mercadoria avariada", text: "Mercadoria danificada." },
+  {
+    title: "Extravio",
+    text: "Transportador assina a NF porém o cliente não recebeu volume; mercadoria entregue em outra drogaria com canhoto assinado.",
   },
 ];

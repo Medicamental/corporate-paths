@@ -27,6 +27,15 @@ export function FlowChain({
     <div className="flex w-full flex-col items-center">
       <NodeCard node={node} active={node.id === activeId} onSelect={() => onSelect(node)} />
 
+      {node.sideNote ? (
+        <div className="mt-3 w-full max-w-xl rounded-lg border border-dashed border-decision/45 bg-decision-soft px-4 py-3">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-decision">
+            Atenção
+          </span>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-foreground/85">{node.sideNote}</p>
+        </div>
+      ) : null}
+
       {node.branches ? (
         <div className="w-full max-w-2xl">
           <BranchSplit />
